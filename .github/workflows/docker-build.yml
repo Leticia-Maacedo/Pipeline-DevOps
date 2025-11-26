@@ -1,55 +1,15 @@
-name: CI/CD - Flask DevOps API
+deploy:
+  runs-on: ubuntu-latest
+  needs: test
+  if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
-on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+  steps:
+    - name: Checkout do código
+      uses: actions/checkout@v4
 
-jobs:
-  # --------------------- BUILD ---------------------
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
+    - name: Build da imagem Docker
+      run: |
+        docker build -t minha-api:latest .
 
-      - name: Build da imagem Docker
-        run: |
-          docker build -t minha-api:latest .
-
-  # --------------------- TEST ----------------------
-  test:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
-
-      - name: Build da imagem Docker para testes
-        run: |
-          docker build -t devops-api-test:${{ github.sha }} .
-
-      - name: Rodar testes dentro do container Docker
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/app -w /app \
-            devops-api-test:${{ github.sha }} \
-            python -m pytest -v
-
-  # --------------------- DEPLOY ---------------------
-  deploy:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
-
-      - name: Login no Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASS }}
-
-#aqui
+    - name: Push da imagem para o Render (sem Docker Hub)
+      run: echo "Deploy será feito diretamente pelo Render"

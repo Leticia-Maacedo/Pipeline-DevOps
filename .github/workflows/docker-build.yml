@@ -42,7 +42,10 @@ jobs:
       - name: Rodar testes
         run: |
           source venv/bin/activate
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
           pytest tests/
+
+   
 
   deploy:
     runs-on: ubuntu-latest

@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline Docker
 
 on:
   push:
@@ -28,24 +28,13 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Configurar Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Instalar dependências
+      - name: Rodar testes dentro do Docker
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
-
-      - name: Rodar testes
-        run: |
-          source venv/bin/activate
-          export PYTHONPATH=$PYTHONPATH:$(pwd)
-          pytest tests/
-
-   
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            minha-api:latest \
+            bash -c "pytest tests/"
 
   deploy:
     runs-on: ubuntu-latest
@@ -54,12 +43,16 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Deploy para Render
+      - name: Deploy dentro do Docker
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
         run: |
-          echo "Iniciando deploy no Render..."
-          curl -X POST https://api.render.com/deploy/srv-${SERVICE_ID} \
-            -H "Authorization: Bearer $RENDER_API_KEY"
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            -e RENDER_API_KEY=$RENDER_API_KEY \
+            -e SERVICE_ID=$SERVICE_ID \
+            minha-api:latest \
+            bash -c "curl -X POST https://api.render.com/deploy/srv-${SERVICE_ID} -H 'Authorization: Bearer $RENDER_API_KEY'"
           echo "Deploy solicitado com sucesso!"

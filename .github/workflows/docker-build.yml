@@ -16,7 +16,7 @@ jobs:
 
       - name: Build da imagem Docker
         run: |
-          docker build -t minha-api:latest ./LabApi_DevOps
+          docker build -t minha-api:latest .
 
   # --------------------- TEST ----------------------
   test:
@@ -28,7 +28,7 @@ jobs:
 
       - name: Build da imagem Docker para testes
         run: |
-          docker build -t minha-api-test:${{ github.sha }} ./LabApi_DevOps
+          docker build -t minha-api-test:${{ github.sha }} .
 
       - name: Rodar testes dentro do container Docker
         run: |
@@ -52,5 +52,5 @@ jobs:
 
       - name: Build e Push da imagem Docker
         run: |
-          docker build -t ${{ secrets.DOCKER_USER }}/minha-api:latest ./LabApi_DevOps
+          docker build -t ${{ secrets.DOCKER_USER }}/minha-api:latest .
           docker push ${{ secrets.DOCKER_USER }}/minha-api:latest

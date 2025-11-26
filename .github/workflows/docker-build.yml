@@ -35,7 +35,11 @@ jobs:
 
       - name: Rodar testes dentro do container Docker (etapa TEST)
         run: |
-          docker run --rm minha-api-test:${{ github.sha }} bash -c "pytest tests/"
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            minha-api-test:${{ github.sha }} \
+            bash -c "export PYTHONPATH=/app && pytest tests/"
 
   deploy:
     runs-on: ubuntu-latest
@@ -51,6 +55,8 @@ jobs:
           SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
         run: |
           docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
             -e RENDER_API_KEY=$RENDER_API_KEY \
             -e SERVICE_ID=$SERVICE_ID \
             minha-api:${{ github.sha }} \

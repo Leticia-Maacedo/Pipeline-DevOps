@@ -2,7 +2,8 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build:
@@ -57,5 +58,5 @@ jobs:
         run: |
           echo "Iniciando deploy no Render..."
           curl -X POST https://api.render.com/deploy/srv-${SERVICE_ID} \
-          -H "Authorization: Bearer $RENDER_API_KEY"
+            -H "Authorization: Bearer $RENDER_API_KEY"
           echo "Deploy solicitado com sucesso!"

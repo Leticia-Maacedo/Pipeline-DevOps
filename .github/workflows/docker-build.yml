@@ -30,7 +30,7 @@ jobs:
 
       - name: Build da imagem Docker para testes
         run: |
-          docker build -t devops-api-test:${{ github.sha }} Pipeline-DevOps
+          docker build -t devops-api-test:${{ github.sha }} .
 
       - name: Rodar testes dentro do container Docker
         run: |
